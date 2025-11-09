@@ -159,6 +159,7 @@ python run_demo.py
 ## 📚 Inspiration
 
 Combining **LightGBM precision control** with **LLM high-level planning** for energy-efficient smart systems.
+https://github.com/kris2475/AI-Informed-Underfloor-Heating-Control-with-ESP32
 
 ---
 
