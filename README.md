@@ -1,9 +1,26 @@
 # 🤖 LLM-Control-Planner: Generative AI for Smart Energy Systems
 
-**LLM-Control-Planner** demonstrates using a **Large Language Model (LLM)** as a *high-level control planner* for embedded or IoT systems.  
-It converts natural-language goals into **deterministic JSON control plans** that are executed by a lower-level controller (simulated ESP32 in this repository).  
+## 🚨 Executive Summary
 
-The focus is on **Generative AI orchestration**, allowing you to showcase complex, intent-driven control without needing real hardware.
+**LLM-Control-Planner** shows how a **Large Language Model (LLM)** can act as a *high-level controller* for smart home or IoT systems.  
+
+In simple terms:
+
+1. You give the system a **natural-language goal** like:  
+   *“Keep the living room at 22°C when occupied, reduce to 19°C when empty, and use extra solar energy to preheat the floor.”*
+
+2. The LLM **converts that goal into a step-by-step plan** in JSON format, deciding **what functions to call and with which values**.  
+
+3. The Python demo **executes the plan** on a simulated ESP32, printing results like:
+
+```
+Target temperature set to 22°C
+Heater power set to 60%
+Preheating floor using solar energy
+[LOG]: Preheating using solar surplus, avoiding overshoot
+```
+
+✅ This immediately shows **how high-level goals become deterministic actions**, balancing comfort, efficiency, and energy use—all without needing real hardware.
 
 ---
 
@@ -21,15 +38,55 @@ The Python demo executes the plan directly, showing the target temperature, heat
 
 ---
 
-## 🧩 Example User Goal
+## ⚡ Example Input & Output
 
-A realistic user intent might be:  
+**User Goal:**
 
 > “Keep the living room around 22°C when people are home, but reduce to 19°C if the house is empty for more than an hour.  
 > If the sun is shining and solar generation exceeds 1.5 kW, use the excess energy to preheat the floor.  
-> However, avoid overshooting the comfort range to prevent wasted heat later in the evening.”  
+> Avoid overshooting the comfort range.”
 
-The **LLM planner** interprets these instructions and generates a deterministic plan that respects all constraints, balancing **comfort, efficiency, and energy availability**.
+**Context:**
+```json
+{
+  "temperature": 21.3,
+  "occupancy": true,
+  "solar_generation": 1.8,
+  "energy_price": 0.24,
+  "time_since_empty": 0.5
+}
+```
+
+**Generated JSON Plan (executed by demo):**
+```json
+{
+  "actions": [
+    { "function": "set_target_temp", "args": { "value": 22 } },
+    { "function": "set_heater_power", "args": { "value": 0.6 } },
+    { "function": "preheat_floor", "args": { "use_solar": true } },
+    { "function": "log_event", "args": { "message": "Preheating using solar surplus, avoiding overshoot" } }
+  ]
+}
+```
+
+**Console Output:**
+```
+Target temperature set to 22°C
+Heater power set to 60%
+Preheating floor using solar energy
+[LOG]: Preheating using solar surplus, avoiding overshoot
+```
+
+---
+
+## 🖥️ How to Read the Output
+
+| Console Line                                  | Meaning                                                                 |
+|-----------------------------------------------|-------------------------------------------------------------------------|
+| `Target temperature set to 22°C`              | The system will maintain 22°C in the living room.                       |
+| `Heater power set to 60%`                      | Heater output is set to 60% to efficiently reach the target temperature.|
+| `Preheating floor using solar energy`          | Extra solar energy is being used to heat the floor, saving electricity. |
+| `[LOG]: Preheating using solar surplus...`     | Informational message from the system explaining its decision.          |
 
 ---
 
@@ -61,52 +118,12 @@ The **LLM planner** interprets these instructions and generates a deterministic 
 
 ---
 
-## ⚡ Example Input & Output
-
-**Input to the LLM:**
-```json
-{
-  "goal": "Keep the living room around 22°C when people are home, but reduce to 19°C if the house is empty for more than an hour. If the sun is shining and solar generation exceeds 1.5 kW, use the excess energy to preheat the floor. Avoid overshooting the comfort range.",
-  "context": {
-    "temperature": 21.3,
-    "occupancy": true,
-    "solar_generation": 1.8,
-    "energy_price": 0.24,
-    "time_since_empty": 0.5
-  }
-}
-```
-
-**LLM Output (executed by the Python demo):**
-```json
-{
-  "actions": [
-    { "function": "set_target_temp", "args": { "value": 22 } },
-    { "function": "set_heater_power", "args": { "value": 0.6 } },
-    { "function": "preheat_floor", "args": { "use_solar": true } },
-    { "function": "log_event", "args": { "message": "Preheating using solar surplus, avoiding overshoot" } }
-  ]
-}
-```
-
-The demo prints:
-
-```
-Target temperature set to 22°C
-Heater power set to 60%
-Preheating floor using solar energy
-[LOG]: Preheating using solar surplus, avoiding overshoot
-```
-
----
-
 ## 🧠 Key Features
 
-- **Natural-language control:** Translate complex, flexible instructions into deterministic commands  
-- **Function-calling LLM API:** Ensures reproducibility, safety, and interpretable plans  
-- **Hardware simulation:** Python stubs simulate ESP32 for testing without devices  
-- **Energy-aware reasoning:** Accounts for occupancy, solar generation, and comfort constraints  
-- **Modular design:** Plans can be executed on real embedded controllers later  
+- Translate **natural language instructions** into deterministic, executable actions  
+- Simulate hardware safely with Python stubs  
+- Use energy-aware reasoning for occupancy, solar, and comfort constraints  
+- Plans can later be run on real embedded controllers  
 
 ---
 
@@ -141,7 +158,7 @@ python run_demo.py
 
 ## 📚 Inspiration
 
-Based on the **AI Climate Control (log(1 + PWMTarget) Bridge)** project, combining **LightGBM precision control** with **LLM high-level planning** for energy-efficient smart systems.
+Combining **LightGBM precision control** with **LLM high-level planning** for energy-efficient smart systems.
 
 ---
 
