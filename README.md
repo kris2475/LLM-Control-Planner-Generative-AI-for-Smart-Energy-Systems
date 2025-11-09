@@ -1,7 +1,7 @@
 # 🤖 LLM-Control-Planner: Generative AI for Smart Energy Systems
 
 **LLM-Control-Planner** demonstrates using a **Large Language Model (LLM)** as a *high-level control planner* for embedded or IoT systems.  
-It converts natural-language goals into **deterministic JSON control plans** that can be executed by a lower-level controller (simulated ESP32 in this repository).  
+It converts natural-language goals into **deterministic JSON control plans** that are executed by a lower-level controller (simulated ESP32 in this repository).  
 
 The focus is on **Generative AI orchestration**, allowing you to showcase complex, intent-driven control without needing real hardware.
 
@@ -17,6 +17,8 @@ This project demonstrates how an **LLM can act as a semantic control bridge**:
 2. **Processing:** The LLM interprets intent and generates a deterministic JSON plan  
 3. **Output:** The plan calls pre-defined control functions like `set_heater_power(x)` or `set_target_temp(y)`  
 
+The Python demo executes the plan directly, showing the target temperature, heater power, and any energy-saving actions in the console.
+
 ---
 
 ## 🧩 Example User Goal
@@ -27,7 +29,6 @@ A realistic user intent might be:
 > If the sun is shining and solar generation exceeds 1.5 kW, use the excess energy to preheat the floor.  
 > However, avoid overshooting the comfort range to prevent wasted heat later in the evening.”  
 
-Manually implementing such logic in traditional rule-based systems is complex and brittle.  
 The **LLM planner** interprets these instructions and generates a deterministic plan that respects all constraints, balancing **comfort, efficiency, and energy availability**.
 
 ---
@@ -54,7 +55,7 @@ The **LLM planner** interprets these instructions and generates a deterministic 
 |  Control Execution Layer |
 | (Simulated ESP32 Kernel) |
 | • Executes commands      |
-| • Feeds back telemetry   |
+| • Prints console output  |
 +--------------------------+
 ```
 
@@ -76,7 +77,7 @@ The **LLM planner** interprets these instructions and generates a deterministic 
 }
 ```
 
-**LLM Output:**
+**LLM Output (executed by the Python demo):**
 ```json
 {
   "actions": [
@@ -88,13 +89,22 @@ The **LLM planner** interprets these instructions and generates a deterministic 
 }
 ```
 
+The demo prints:
+
+```
+Target temperature set to 22°C
+Heater power set to 60%
+Preheating floor using solar energy
+[LOG]: Preheating using solar surplus, avoiding overshoot
+```
+
 ---
 
 ## 🧠 Key Features
 
 - **Natural-language control:** Translate complex, flexible instructions into deterministic commands  
 - **Function-calling LLM API:** Ensures reproducibility, safety, and interpretable plans  
-- **Hardware simulation:** Mocked ESP32 environment allows testing without physical devices  
+- **Hardware simulation:** Python stubs simulate ESP32 for testing without devices  
 - **Energy-aware reasoning:** Accounts for occupancy, solar generation, and comfort constraints  
 - **Modular design:** Plans can be executed on real embedded controllers later  
 
@@ -103,8 +113,7 @@ The **LLM planner** interprets these instructions and generates a deterministic 
 ## 🧰 Tech Stack
 
 - **Python** (main control logic)  
-- **OpenAI / LLaMA function-calling API** (LLM orchestration)  
-- **FastAPI** (optional REST interface)  
+- **Transformers / Hugging Face models** (free LLM for plan generation)  
 - **Simulated ESP32 hardware layer** (Python mock)  
 - **JSON schema validation** (deterministic plan verification)  
 
