@@ -1,40 +1,50 @@
 # 🤖 LLM-Control-Planner: Generative AI for Smart Energy Systems
 
-**LLM-Control-Planner** is a demonstration of using a **Large Language Model (LLM)** as a *high-level control planner* for embedded or IoT systems.  
-It translates natural-language goals (e.g. “Keep the room comfortable but save energy when solar power is high”) into a **deterministic JSON control plan** that can be executed by a lower-level controller such as an ESP32 running a LightGBM or PID-based kernel.
+**LLM-Control-Planner** demonstrates using a **Large Language Model (LLM)** as a *high-level control planner* for embedded or IoT systems.  
+It converts natural-language goals into **deterministic JSON control plans** that can be executed by a lower-level controller (simulated ESP32 in this repository).  
 
-This repository focuses on the *Generative AI orchestration layer* — not the physical hardware.  
-The hardware is **simulated**, allowing experimentation and demonstration of the control logic without needing an actual underfloor heating setup.
+The focus is on **Generative AI orchestration**, allowing you to showcase complex, intent-driven control without needing real hardware.
 
 ---
 
 ## 🔍 Overview
 
-Traditional control systems are rule-based or model-driven, optimised for efficiency within fixed boundaries.  
-However, they struggle to interpret **human intent** or adapt dynamically to contextual conditions (like sunlight, occupancy, or energy price forecasts).
+Traditional control systems struggle with **multi-variable, context-dependent goals**, such as balancing comfort, occupancy, solar energy use, and thermal inertia.  
 
 This project demonstrates how an **LLM can act as a semantic control bridge**:
 
-1. **Input:** Natural-language goals + contextual sensor data.  
-2. **Processing:** The LLM converts intent into a deterministic, machine-readable control plan (JSON).  
-3. **Output:** The plan calls pre-defined control functions such as `set_heater_power(x)` or `adjust_target_temp(y)`.
+1. **Input:** Natural-language goals + contextual sensor data  
+2. **Processing:** The LLM interprets intent and generates a deterministic JSON plan  
+3. **Output:** The plan calls pre-defined control functions like `set_heater_power(x)` or `set_target_temp(y)`  
 
 ---
 
-## 🧩 Architecture
+## 🧩 Example User Goal
+
+A realistic user intent might be:  
+
+> “Keep the living room around 22°C when people are home, but reduce to 19°C if the house is empty for more than an hour.  
+> If the sun is shining and solar generation exceeds 1.5 kW, use the excess energy to preheat the floor.  
+> However, avoid overshooting the comfort range to prevent wasted heat later in the evening.”  
+
+Manually implementing such logic in traditional rule-based systems is complex and brittle.  
+The **LLM planner** interprets these instructions and generates a deterministic plan that respects all constraints, balancing **comfort, efficiency, and energy availability**.
+
+---
+
+## ⚙️ Architecture
 
 ```text
 +--------------------------+
 |   User / External Agent  |
-| "Keep the room at 22°C   |
-|  but save energy if sunny"|
+| Natural language intent  |
 +------------+-------------+
              |
              v
 +--------------------------+
 |       LLM Planner        |
 | (Function-calling API)   |
-| • Parses natural language|
+| • Parses intent          |
 | • Interprets context     |
 | • Outputs JSON plan      |
 +------------+-------------+
@@ -50,17 +60,18 @@ This project demonstrates how an **LLM can act as a semantic control bridge**:
 
 ---
 
-## ⚙️ Example Interaction
+## ⚡ Example Input & Output
 
-**Input:**
+**Input to the LLM:**
 ```json
 {
-  "goal": "Keep the living room around 22°C when occupied, reduce to 19°C if empty, and use solar excess for preheating.",
+  "goal": "Keep the living room around 22°C when people are home, but reduce to 19°C if the house is empty for more than an hour. If the sun is shining and solar generation exceeds 1.5 kW, use the excess energy to preheat the floor. Avoid overshooting the comfort range.",
   "context": {
     "temperature": 21.3,
     "occupancy": true,
     "solar_generation": 1.8,
-    "energy_price": 0.24
+    "energy_price": 0.24,
+    "time_since_empty": 0.5
   }
 }
 ```
@@ -71,7 +82,8 @@ This project demonstrates how an **LLM can act as a semantic control bridge**:
   "actions": [
     { "function": "set_target_temp", "args": { "value": 22 } },
     { "function": "set_heater_power", "args": { "value": 0.6 } },
-    { "function": "log_event", "args": { "message": "Preheating using solar surplus" } }
+    { "function": "preheat_floor", "args": { "use_solar": true } },
+    { "function": "log_event", "args": { "message": "Preheating using solar surplus, avoiding overshoot" } }
   ]
 }
 ```
@@ -80,21 +92,21 @@ This project demonstrates how an **LLM can act as a semantic control bridge**:
 
 ## 🧠 Key Features
 
-- **Natural-language control:** Translate user intent into actionable control logic.
-- **Function-calling LLM API:** Deterministic JSON plans ensure reproducibility and safety.
-- **Hardware simulation:** Mocked ESP32 environment for development and testing.
-- **Modular design:** Swap in real hardware control interfaces later.
-- **Energy-awareness:** Context-driven reasoning (temperature, solar, occupancy, cost).
+- **Natural-language control:** Translate complex, flexible instructions into deterministic commands  
+- **Function-calling LLM API:** Ensures reproducibility, safety, and interpretable plans  
+- **Hardware simulation:** Mocked ESP32 environment allows testing without physical devices  
+- **Energy-aware reasoning:** Accounts for occupancy, solar generation, and comfort constraints  
+- **Modular design:** Plans can be executed on real embedded controllers later  
 
 ---
 
 ## 🧰 Tech Stack
 
-- **Python** (main control logic)
-- **OpenAI / Llama function calling** (LLM orchestration)
-- **FastAPI** (optional REST interface)
-- **Simulated hardware layer** (Python mock of ESP32 control)
-- **JSON schema validation** (for deterministic plan execution)
+- **Python** (main control logic)  
+- **OpenAI / LLaMA function-calling API** (LLM orchestration)  
+- **FastAPI** (optional REST interface)  
+- **Simulated ESP32 hardware layer** (Python mock)  
+- **JSON schema validation** (deterministic plan verification)  
 
 ---
 
@@ -109,34 +121,24 @@ python run_demo.py
 
 ---
 
-## 📄 Example: Generated Control Plan
-
-Run the demo and see how the LLM converts intent into deterministic commands:
-
-```bash
-python run_demo.py --goal "Keep the house warm when occupied, reduce power when unoccupied, use solar gain when available."
-```
-
----
-
 ## 🧩 Future Extensions
 
-- Integrate with real ESP32 MQTT control nodes.  
-- Add reinforcement feedback (auto-tuning of setpoints).  
-- Include weather forecasts and price signals for predictive planning.  
-- Explore smaller local LLMs for on-edge reasoning.  
+- Connect to real ESP32 MQTT nodes for live testing  
+- Add reinforcement learning for plan optimisation  
+- Include weather forecasts and energy price data for predictive control  
+- Explore local LLMs for edge deployment  
 
 ---
 
 ## 📚 Inspiration
 
-This project extends the ideas explored in my **AI Climate Control (log(1 + PWMTarget) Bridge)** series — combining **LightGBM precision control** with **LLM-based high-level planning** for energy-efficient systems.
+Based on the **AI Climate Control (log(1 + PWMTarget) Bridge)** project, combining **LightGBM precision control** with **LLM high-level planning** for energy-efficient smart systems.
 
 ---
 
 ## 🏷️ Tags
 
-`#GenAI` `#LLM` `#IoT` `#EdgeAI` `#EnergyEfficiency` `#ControlSystems`
+`#GenAI` `#LLM` `#IoT` `#EdgeAI` `#EnergyEfficiency` `#ControlSystems`  
 
 ---
 
