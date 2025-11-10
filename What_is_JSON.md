@@ -3,7 +3,7 @@
 ## 🧩 Simple Explanation
 JSON stands for **JavaScript Object Notation**.  
 It’s a way to store and share data using text that both humans and computers can easily understand.  
-Think of it like a box that holds information — things like names, numbers, lists, and other details — all neatly labeled.
+Think of it like a box that holds information — things like names, numbers, lists, and other details — all neatly labelled.
 
 ---
 
