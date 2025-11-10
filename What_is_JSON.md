@@ -13,6 +13,12 @@ Think of it like a box that holds information — things like names, numbers, li
 ✅ Great for sharing data between computers, websites, and apps
 
 ---
+## 💡 In Short
+
+JSON is just a simple way to organize and share data.
+It’s like a digital notebook where everything is written in a clear, structured way that computers understand.
+
+---
 
 ## 📁 What Does a JSON File Look Like?
 A JSON file usually ends with `.json`, for example: `data.json`.
@@ -26,8 +32,3 @@ Here’s a simple example:
   "hobbies": ["reading", "coding", "music"],
   "isStudent": false
 }
-
-💡 In Short
-
-JSON is just a simple way to organize and share data.
-It’s like a digital notebook where everything is written in a clear, structured way that computers understand.
