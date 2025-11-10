@@ -27,3 +27,7 @@ Here’s a simple example:
   "isStudent": false
 }
 
+💡 In Short
+
+JSON is just a simple way to organize and share data.
+It’s like a digital notebook where everything is written in a clear, structured way that computers understand.
