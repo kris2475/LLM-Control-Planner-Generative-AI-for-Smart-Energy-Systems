@@ -15,7 +15,7 @@ Think of it like a box that holds information — things like names, numbers, li
 ---
 ## 💡 In Short
 
-JSON is just a simple way to organize and share data.
+JSON is just a simple way to organise and share data.
 It’s like a digital notebook where everything is written in a clear, structured way that computers understand.
 
 ---
